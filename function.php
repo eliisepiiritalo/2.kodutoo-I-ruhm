@@ -24,15 +24,15 @@
 
 	$database = "if16_eliispiiri";
 
-	function signup ($email, $password) {
+	function signup ($Name, $Age, $Email, $password, $Gender) {
 
 		$mysqli = new mysqli($GLOBALS["serverHost"],$GLOBALS["serverUsername"],$GLOBALS["serverPassword"],$GLOBALS["database"]);
 
-		$stmt = $mysqli->prepare("INSERT INTO user_sample (email, password) VALUES (?, ?)");
+		$stmt = $mysqli->prepare("INSERT INTO user_sample (Name, Age, Email, password, Gender) VALUES (?,?,?,?,?)");
 
 		echo $mysqli->error;
 
-		$stmt->bind_param("ss", $email, $password);
+		$stmt->bind_param("sisss",$Name, $Age, $Email, $password, $Gender);
 
 		if ($stmt->execute()) {
 
@@ -46,7 +46,7 @@
 
 	}
 
-	function login($email, $password) {
+	function login($Email, $password) {
 
 		$error = "";
 
@@ -54,11 +54,11 @@
 
 		$stmt = $mysqli->prepare("
 
-			SELECT id, email, password, created 
+			SELECT id, Email, password, created
 
 			FROM user_sample
 
-			WHERE email = ?
+			WHERE Email = ?
 
 		");
 
@@ -66,11 +66,11 @@
 
 		//asendan küsimärgi
 
-		$stmt->bind_param("s", $email);
+		$stmt->bind_param("s", $Email);
 
 		//määran tupladele muutujad
 
-		$stmt->bind_result($id, $emailFromDb, $passwordFromDb, $created);
+		$stmt->bind_result($id, $EmailFromDb, $passwordFromDb, $created);
 
 		$stmt->execute();
 
@@ -90,11 +90,13 @@
 
 				$_SESSION["userId"] = $id;
 
-				$_SESSION["email"] = $emailFromDb;
+				$_SESSION["Email"] = $EmailFromDb;
+				
+				//$_SESSION["Name"] = $NameFromDB;
 
 				//suunaks uuele lehele
 
-				header("Location: data.php");
+				
 
 				} else {
 
@@ -106,7 +108,7 @@
 
 			//ei olnud 
 
-			$error = "sellise emailiga ".$email." kasutajat ei olnud";
+			$error = "sellise emailiga ".$Email." kasutajat ei olnud";
 
 		}
 
@@ -114,15 +116,13 @@
 
 		}
 
-	function savePeople ($gender, $color) {
+	function savePeople ($Gender, $Age, $Meal, $date) {
 
 		$mysqli = new mysqli($GLOBALS["serverHost"],$GLOBALS["serverUsername"],$GLOBALS["serverPassword"],$GLOBALS["database"]);
 
-		$stmt = $mysqli->prepare("INSERT INTO clothingOnTheCampus (gender, color) VALUES (?, ?)");
+		$stmt = $mysqli->prepare("INSERT INTO Calender (Gender, Age, Meal, date) VALUES (?,?,?,?)");
 
-		echo $mysqli->error;
-
-		$stmt->bind_param("ss", $gender, $color);
+		$stmt->bind_param("siss", $Gender, $Age, $Meal, $date);
 
 		if ($stmt->execute()) {
 
@@ -142,15 +142,15 @@
 
 		$stmt = $mysqli->prepare("
 
-			SELECT id, gender, color, created
+			SELECT id, Gender, Age, Meal, date
 
-			FROM clothingOnTheCampus
+			FROM Calender
 
 		");
 
 		echo $mysqli->error;
 
-		$stmt->bind_result($id, $gender, $color, $created);
+		$stmt->bind_result($id, $Gender, $Age, $Meal, $date);
 
 		$stmt->execute();
 
@@ -164,13 +164,17 @@
 
 			$person = new StdClass();
 
-			$person->id = $id;
+			$person->id=$id;
 
-			$person->gender = $gender;
+			$person->Gender=$Gender;
 
-			$person->clothingColor = $color;
+			$person->Age=$Age;
 
-			$person->created = $created;
+			$person->Meal=$Meal;
+			
+			$person->date=$date;
+			
+			
 
 			//echo $color."<br>";
 
@@ -185,18 +189,27 @@
 		return $result;
 
 	}
-
+	
+	function cleanInput($input) {
+		
+		//input = "eliize95@tlu.ee  "
+		
+		$input = trim($input);
+		
+		//input = "eliize95@tlu.ee"
+		
+		$input = stripslashes($input);
+		$input = htmlspecialchars($input);
+		
+		return $input;
+	}
+	
 	/*function sum ($x, $y) {
 
 		return $x + $y;
 
-		}
+	}
 
-		function hello ($firstname, $lastname) {
-
-		return "Tere tulemast ".$firstname." ".$lastname."!";
-
-		}
 
 	echo sum(5476567567,234234234);
 
@@ -208,33 +221,12 @@
 
 	echo "<br>";
 
-	echo hello ("Eliise", "P.");
+	function hello ($firstname, $lastname) {
 
-	*/
-
-	/*
-
-	function issetAndNotEmpty($var) {	
-
-		if ( isset ( $var ) ) {
-
-			if ( !empty ($var ) ) {
-
-				return true;			
-
-			}	
-
-		} 
-
-		return false;	
-
+		return "Tere tulemast ".$firstname." ".$lastname."!";
+	echo hello("Eliise", "P.");
 	}
-
-	if (issetAndNotEmpty($_POST["loginEmail"])) {
-
-		//vastab tõele
-
-		}
-
+	
 	*/
+
 ?>

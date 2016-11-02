@@ -72,9 +72,9 @@
 
 			
 
-			if (strlen ($_POST["signupPassword"]) <= 5 ){
+			if (strlen ($_POST["signupPassword"]) <= 8 ){
 
-				$signupPasswordError = "Parool peab olema 5 tähemärki pikk!";
+				$signupPasswordError = "Parool peab olema 8 tähemärki pikk!";
 
 			}
 
@@ -194,6 +194,9 @@
 		
 
 		//echo $serverUsername; 
+		
+		$signupEmail = cleanInput($signupEmail);
+		$password = cleanInput($password);
 
 		
 
@@ -284,11 +287,6 @@
 					<input type="radio" name="gender" value="female" > Female<br>
 			<?php } ?>
 			
-			<?php if($gender == "other") { ?>
-					<input type="radio" name="gender" value="other" checked> Other<br>
-			<?php } else{ ?>
-					<input type="radio" name="gender" value="other" > Other<br>
-			<?php } ?>
 			
 			<br><br>
 

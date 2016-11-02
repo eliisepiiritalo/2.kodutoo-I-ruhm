@@ -9,6 +9,7 @@
 	if (!isset ($_SESSION["userId"])) {
 
 		header("Location: login.php");
+		exit();
 
 	}
 
@@ -19,126 +20,175 @@
 		session_destroy();
 
 		header("Location: login.php");
+		exit();
 
 	}
 
-	// ei ole tühjad väljad mida salvestada
-
-	if ( isset($_POST["gender"]) &&
-
-		 isset($_POST["color"]) &&
-
-		 !empty($_POST["gender"]) &&
-
-		 !empty($_POST["color"])
+			// echo $date
+			
+	//muutujad
+	$Gender="";
+	$GenderError="";
+	$Age="";
+	$AgeError="";
+	$Meal="";
+	$MealError="";
+	$Date="";
+	$DateError="";
+	
+	//Kontrollin, kas kasutaja sisestas andmed
+	if(isset($_POST["Age"])) {
+			if (empty($_POST["Age"])){
+			$AgeError="See väli on kohustuslik!";
+			
+			}else {
+				$Age=$_POST["Age"];
+			}
+	}
+	
+	if(isset($_POST["Meal"])) {
+		if(empty($_POST["Meal"])){
+			$MealError="See väli on kohustuslik!";
+			
+		}else{
+			$Meal=$_POST["Meal"];
+		}
+	}
+	
+	if(isset($_POST["Date"])) {
+		if(empty($_POST["Date"])){
+			$DateError="See väli on kohustuslik!";
+			
+		}else{
+			$Date=$_POST["Date"];
+		}
+	}
+	//Ühtegi viga ei olnud ja saan kasutaja andmed salvestada
+	if ( isset($_POST["Gender"]) &&
+		isset($_POST["Age"]) &&
+		isset($_POST["Meal"]) &&
+		isset($_POST["Date"]) &&
+		
+		
+		empty($_POST["GenderError"]) &&
+		empty($_POST["AgeError"]) &&
+		empty($_POST["MealError"]) &&
+		empty($_POST["DateError"])  
 
 	  ) {
+		  
+		  echo "siin";
+		  
+			$Gender=cleanInput($_POST["Gender"]);
+			$Age=cleanInput($_POST["Age"]);
+			$Meal=cleanInput($_POST["Meal"]);
+			//$Date=cleanInput($_POST["Date"]);
 
-		savePeople($_POST["gender"], $_POST["color"]);
-
+			$date = new Datetime ($_POST['Date']);
+			$date = $date->format('Y-m-d');
+		
+			savePeople($_POST["Gender"], $_POST["Age"], $_POST["Meal"], $date);
+	
+	//header("Location: data.php");
+	//exit();
+	
 	}
 
 	$people = getAllPeople();
-
-	//echo "<pre>";
-
-	//var_dump($people);
-
-	//echo "</pre>";
+	
+	//var_dump($people[1]);
 	
 ?>
 
-<h1>Data</h1>
+<h1>Toidukordade sisestamine</h1>
 
 <p>
 
-	Tere tulemast <?=$_SESSION["email"];?>!
+	Tere tulemast <?=$_SESSION["Email"];?>!
 
 	<a href="?logout=1">Logi välja</a>
 
 </p> 
 
-<h1>Inimese salvestamine</h1>
+<h1>Salvesta andmed</h1>
 
 <form method="POST">
 
 	<label>Sugu</label><br>
 	
-	<input type="radio" name="gender" value="male" > Mees<br>
+	<input type="radio" name="Gender" value="male" > Mees<br>
 
-	<input type="radio" name="gender" value="female" > Naine<br>
-
-	<input type="radio" name="gender" value="Unknown" > Ei oska öelda<br>
+	<input type="radio" name="Gender" value="female" > Naine<br>
+	
+	<br><br>
+	<label>Vanus</label><br>
+	<input name="Age" type="number">
 
 	<br><br>
-	<label>värv</label><br>
-	<input name = "color" type = "color">
+	<label>Söögikord</label><br>
+	<select name="Toidukord">
+	<option value="" disabled selected>Vali söögikord</option>
+	<option value="Hommikusöök">Hommikusöök</option>
+	<option value="Lõunasöök">Lõunasöök</option>
+	<option value="Õhtusöök">Õhtusöök</option>
+	</select>
+	
+	
+	<input name="Meal" type="text" placeholder="sisaldab">
+	<br><br>
+	
+	<label>Kuupäev</label><br>
+	<input name="Date" type="date" placeholder="Kuupäev">
+	
+
+	
 	<br><br>
 	<input type = "submit" value = "Salvesta">
 
 	<!--<input type="text" name="gender" ><br>-->
+	
+	
 
 
 </form>
 
-<h2>Arhiiv</h2>
-
-<?php 
-
-
-	foreach($people as $p){
-
-		echo 	"<h3 style=' color:".$p->clothingColor."; '>"
-
-				.$p->gender
-
-				."</h3>";
-}
-
-?>
-
-<h2>Arhiivtabel</h2>
-
-<?php 
-
-	$html = "<table>";
-
-		$html .= "<tr>";
-
-			$html .= "<th>Id</th>";
-
-			$html .= "<th>Sugu</th>";
-
-			$html .= "<th>Värv</th>";
-
-			$html .= "<th>Loodud</th>";
-
-		$html .= "</tr>";
+<!--<h2>Varasemad andmed</h2>
 
 		foreach($people as $p){
+			
+			echo "<h3 style=' Color:".$p->Color."; '>".$p->Gender."</h3>;
+		}
+		
+	-->
 
-			$html .= "<tr>";
+<br><br>	
+<h2> Kasutajate andmed </h2>
+<?php
 
-				$html .= "<td>".$p->id."</td>";
-
-				$html .= "<td>".$p->gender."</td>";
-
-				$html .= "<td style=' background-color:".$p->clothingColor."; '>"
-
-						.$p->clothingColor
-
-						."</td>";
-
-				//<img width="200" src=' ".$url." '>
-
-			$html .= "<td>".$p->created."</td>";
-
-			$html .= "</tr>";	
-
-			}
-
-	$html .= "</table>";
-
-	echo $html;
+		$html="<table>";
+				$html .="<tr>";
+					$html .="<th>id</th>";
+					$html .="<th>Sugu</th>";
+					$html .="<th>Vanus</th>";
+					$html .="<th>Söögikord</th>";
+					$html .="<th>Kuupäev</th>";
+				$html .="</tr>";
+				
+				foreach($people as $p){
+					$html .="<tr>";
+							$html .="<td>".$p->id."</td>";
+							$html .="<td>".$p->Gender."</td>";
+							$html .="<td>".$p->Age."</td>";
+							$html .="<td>".$p->Meal."</td>";
+							$html .="<td>".$p->date."</td>";
+							//$html .="<td style=' backround-color:".$p->Color."; '>$p->Color."</td>";
+							//<img width="200" src=' ".$url." '>
+					
+					$html .="</tr>";
+									
+							
+				}
+		$html .="</table>";
+		echo $html;
 	
 ?>
